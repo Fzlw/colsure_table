@@ -13,6 +13,3 @@ run/
 typings/
 .nyc_output/
 *.yml
-wx.myserve.cn/*
-wx.myserve.cn
-document/*

@@ -1,13 +1,14 @@
 {
   "name": "colsure_table",
   "version": "1.0.0",
+  "private": true,
   "description": "ColsureTable实现无限级分类",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node ./bin/www",
     "model": "node node_modules/egg-sequelize-auto/bin/egg-sequelize-auto -o \"./app/model\" -d colsure_table -h 120.77.222.224 -u colsure -p 3306 -x colsure@2019 -e mysql"
   },
   "repository": {
@@ -21,6 +22,10 @@
   },
   "homepage": "https://github.com/Fzlw/colsure_table#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "sequelize": "^5.9.0"
+  },
+  "devDependencies": {
+    "debug": "^4.1.1"
   }
 }
