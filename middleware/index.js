@@ -1,7 +1,5 @@
-const mw_404 = require('./_404');
-const mw_err = require('./_err');
+const path = require('path');
+const load = require('../utils/load');
+const Module = load(path.resolve(__dirname, '../middleware/'), [__filename]);
 
-module.exports = {
-  _404: mw_404,
-  _err: mw_err
-};
+module.exports = Module;
