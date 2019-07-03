@@ -1,6 +1,7 @@
 const relation = require('../service/relation');
 const {
-  APIS
+  APIS,
+  COMMON
 } = require('../enums');
 
 class Relation {
@@ -14,6 +15,7 @@ class Relation {
     let result = APIS.getBaseResponse();
     // 参数验证
     if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
       !query.node_id || typeof query.node_id !== 'string' ||
       !query.p_id || typeof query.p_id !== 'string' ||
       query.p_id === query.node_id) {
@@ -22,31 +24,52 @@ class Relation {
       return;
     }
     try {
-      const isCreate = await relation.isRecord(query.p_id, query.node_id);
+      const isCreate = await relation.isRecord({
+        nodeId: query.node_id,
+        pId: query.p_id,
+        _name: query._name
+      });
       if (isCreate) {
         result = APIS.getSuccess();
         res.send(result);
         return;
       }
-      const existAndRoot = await relation.getNodeIsExistAndIsRoot(query.p_id);
+      const existAndRoot = await relation.getNodeIsExistAndIsRoot({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       if (!existAndRoot.exist) {
-        const suc = await relation.addNodeForNoExist(
-          query.p_id, query.node_id
-        );
+        const suc = await relation.addNodeForNoExist({
+          pId: query.p_id,
+          nId: query.node_id,
+          _name: query._name
+        });
         !suc && (result.message = '创建失败');
         suc && (result.success = true);
         res.send(result);
         return;
       }
       if (existAndRoot.root) {
-        const suc = await relation.addNodeForRoot(query.p_id, query.node_id);
+        const suc = await relation.addNodeForRoot({
+          pId: query.p_id,
+          nId: query.node_id,
+          _name: query._name
+        });
         !suc && (result.message = '创建失败');
         suc && (result.success = true);
         res.send(result);
         return;
       }
-      const parents = await relation.getParentsOfNode(query.p_id);
-      const addNode = await relation.addNodeForChild(parents, query.p_id, query.node_id);
+      const parents = await relation.getParentsOfNode({
+        nodeId: query.node_id,
+        _name: query._name
+      });
+      const addNode = await relation.addNodeForChild({
+        nodeId: query.node_id,
+        parents,
+        parentId: query.p_id,
+        _name: query._name
+      });
       if (!addNode) {
         result.message = '创建失败';
         res.send(result);
@@ -68,13 +91,17 @@ class Relation {
     let result = APIS.getBaseResponse();
     // 参数验证
     if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
       !query.node_id || typeof query.node_id !== 'string') {
       result.message = '参数无效';
       res.send(result);
       return;
     }
     try {
-      const len = await relation.getNodeMaxDistance(query.node_id);
+      const len = await relation.getNodeMaxDistance({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       if (len === -1) {
         result.message = '节点不存在';
         res.send(result);
@@ -101,13 +128,17 @@ class Relation {
     let result = APIS.getBaseResponse();
     // 参数验证
     if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
       !query.node_id || typeof query.node_id !== 'string') {
       result.message = '参数无效';
       res.send(result);
       return;
     }
     try {
-      const parents = await relation.getParentsOfNode(query.node_id);
+      const parents = await relation.getParentsOfNode({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       if (!Array.isArray(parents) || !parents.length) {
         result.message = '节点不存在';
         res.send(result);
@@ -134,6 +165,7 @@ class Relation {
     let result = APIS.getBaseResponse();
     // 参数验证
     if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
       !query.node_id || typeof query.node_id !== 'string') {
       result.message = '参数无效';
       res.send(result);
@@ -142,13 +174,19 @@ class Relation {
     try {
       const {
         exist
-      } = await relation.getNodeIsExistAndIsRoot(query.node_id);
+      } = await relation.getNodeIsExistAndIsRoot({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       if (!exist) {
         result.message = '节点不存在';
         res.send(result);
         return;
       }
-      const children = await relation.getChildrenOfNode(query.node_id);
+      const children = await relation.getChildrenOfNode({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       result = {
         ...APIS.getSuccess(),
         data: {
@@ -170,13 +208,16 @@ class Relation {
     let result = APIS.getBaseResponse();
     // 参数验证
     if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
       !query.node_id || typeof query.node_id !== 'string') {
       result.message = '参数无效';
       res.send(result);
       return;
     }
     try {
-      const leaf = await relation.getNodeIsLeaf(query.node_id);
+      const leaf = await relation.getNodeIsLeaf({
+        nodeId: query.node_id
+      });
       if (leaf === null) {
         result.message = '节点不存在';
         res.send(result);
@@ -203,6 +244,7 @@ class Relation {
     let result = APIS.getBaseResponse();
     // 参数验证
     if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
       !query.node_id || typeof query.node_id !== 'string') {
       result.message = '参数无效';
       res.send(result);
@@ -211,13 +253,19 @@ class Relation {
     try {
       const {
         exist
-      } = await relation.getNodeIsExistAndIsRoot(query.node_id);
+      } = await relation.getNodeIsExistAndIsRoot({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       if (!exist) {
         result.message = '节点不存在';
         res.send(result);
         return;
       }
-      const directParents = await relation.getDirectParents(query.node_id);
+      const directParents = await relation.getDirectParents({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       result = {
         ...APIS.getSuccess(),
         data: {
@@ -239,6 +287,7 @@ class Relation {
     let result = APIS.getBaseResponse();
     // 参数验证
     if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
       !query.node_id || typeof query.node_id !== 'string') {
       result.message = '参数无效';
       res.send(result);
@@ -247,17 +296,53 @@ class Relation {
     try {
       const {
         exist
-      } = await relation.getNodeIsExistAndIsRoot(query.node_id);
+      } = await relation.getNodeIsExistAndIsRoot({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       if (!exist) {
         result.message = '节点不存在';
         res.send(result);
         return;
       }
-      const directChildren = await relation.getDirectChildren(query.node_id);
+      const directChildren = await relation.getDirectChildren({
+        nodeId: query.node_id,
+        _name: query._name
+      });
       result = {
         ...APIS.getSuccess(),
         data: {
           children: directChildren
+        }
+      };
+    } catch (error) {
+      result = APIS.getError();
+    }
+    res.send(result);
+  }
+
+  /**
+   * 获取所有节点id
+   * GET
+   */
+  async getAllNodes(req, res) {
+    const query = req.query;
+    let result = APIS.getBaseResponse();
+    // 参数验证
+    if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES)) {
+      result.message = '参数无效';
+      res.send(result);
+      return;
+    }
+    try {
+      const list = await relation.getAllNode({
+        _name: COMMON._NAMES[query._name]
+      });
+      result = {
+        ...APIS.getSuccess(),
+        data: {
+          nodes: list
         }
       };
     } catch (error) {

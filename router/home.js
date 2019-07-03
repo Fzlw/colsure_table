@@ -17,4 +17,6 @@ module.exports = app => {
   router.get('/relation/direct/parent', controller.relation.getDirectParent);
   // 获取节点的直接子节点
   router.get('/relation/direct/children', controller.relation.getDirectChildren);
+  // 获取所有节点id
+  router.get('/relation/nodes/all', controller.relation.getAllNodes);
 };

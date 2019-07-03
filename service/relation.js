@@ -1,16 +1,17 @@
-const Relation = require('../model/relation');
-const {
-  sequelize
-} = require('../db/sequelize');
+const model = require('../model');
 const {
   COMMON
 } = require('../enums');
 
 class RelationService {
 
-  async getNodeIsExistAndIsRoot(nodeId) {
+  async getNodeIsExistAndIsRoot(options) {
+    const {
+      nodeId,
+      _name
+    } = options;
     try {
-      let entity = await Relation.findOne({
+      let entity = await model[_name].findOne({
         where: {
           valid: COMMON.VALID.valid,
           descendant: nodeId
@@ -36,9 +37,13 @@ class RelationService {
     }
   }
 
-  async getNodeIsRoot(nodeId) {
+  async getNodeIsRoot(options) {
+    const {
+      nodeId,
+      _name
+    } = options;
     try {
-      let entity = await Relation.findOne({
+      let entity = await model[_name].findOne({
         where: {
           valid: COMMON.VALID.valid,
           ancestor: nodeId,
@@ -56,10 +61,14 @@ class RelationService {
     }
   }
 
-  async getParentsOfNode(nodeId) {
+  async getParentsOfNode(options) {
+    const {
+      nodeId,
+      _name
+    } = options;
     let list = [];
     try {
-      list = await Relation.findAll({
+      list = await model[_name].findAll({
         attributes: ['ancestor', 'distance'],
         where: {
           valid: COMMON.VALID.valid,
@@ -72,10 +81,14 @@ class RelationService {
     }
   }
 
-  async getChildrenOfNode(nodeId) {
+  async getChildrenOfNode(options) {
+    const {
+      nodeId,
+      _name
+    } = options;
     let list = [];
     try {
-      list = await Relation.findAll({
+      list = await model[_name].findAll({
         attributes: ['ancestor', 'distance'],
         where: {
           valid: COMMON.VALID.valid,
@@ -88,7 +101,12 @@ class RelationService {
     }
   }
 
-  async addNodeForNoExist(pId, nId) {
+  async addNodeForNoExist(options) {
+    const {
+      pId,
+      nId,
+      _name
+    } = options;
     try {
       const data = [{
         ancestor: pId,
@@ -101,7 +119,7 @@ class RelationService {
         distance: 1,
         create_time: new Date()
       }];
-      const result = await Relation.bulkCreate(data);
+      const result = await model[_name].bulkCreate(data);
       if (Array.isArray(result) && result.length === data.length) {
         return true;
       }
@@ -111,9 +129,14 @@ class RelationService {
     }
   }
 
-  async addNodeForRoot(pId, nId) {
+  async addNodeForRoot(options) {
+    const {
+      pId,
+      nId,
+      _name
+    } = options;
     try {
-      const newRecord = await Relation.create({
+      const newRecord = await model[_name].create({
         ancestor: pId,
         descendant: nId,
         distance: 1,
@@ -128,7 +151,13 @@ class RelationService {
     }
   }
 
-  async addNodeForChild(parents, parentId, nodeId) {
+  async addNodeForChild(options) {
+    const {
+      nodeId,
+      parents,
+      parentId,
+      _name
+    } = options;
     const newParents = parents.map(parent => {
       parent = parent && parent.dataValues;
       return {
@@ -145,7 +174,7 @@ class RelationService {
       create_time: new Date()
     });
     try {
-      const result = await Relation.bulkCreate(newParents);
+      const result = await model[_name].bulkCreate(newParents);
       if (Array.isArray(result) && result.length === newParents.length) {
         return true;
       }
@@ -155,9 +184,14 @@ class RelationService {
     }
   }
 
-  async isRecord(pId, nodeId) {
+  async isRecord(options) {
+    const {
+      nodeId,
+      pId,
+      _name
+    } = options;
     try {
-      let entity = await Relation.findOne({
+      let entity = await model[_name].findOne({
         where: {
           ancestor: pId,
           descendant: nodeId,
@@ -175,9 +209,13 @@ class RelationService {
     }
   }
 
-  async getNodeMaxDistance(nodeId) {
+  async getNodeMaxDistance(options) {
+    const {
+      nodeId,
+      _name
+    } = options;
     try {
-      let entity = await Relation.findOne({
+      let entity = await model[_name].findOne({
         where: {
           valid: COMMON.VALID.valid,
           descendant: nodeId
@@ -193,9 +231,12 @@ class RelationService {
     }
   }
 
-  async getNodeIsLeaf(nodeId) {
+  async getNodeIsLeaf(options) {
+    const {
+      nodeId
+    } = options;
     try {
-      const entities = await sequelize.query(`
+      const entities = await model.sequelize.query(`
         select (
           select count(*)
           from relation where valid=:valid and ancestor=:ancestorId
@@ -205,7 +246,7 @@ class RelationService {
           from relation where valid=:valid and descendant=:descendantId
         ) as num_2
       `, {
-        trye: sequelize.QueryTypes.SELECT,
+        trye: model.sequelize.QueryTypes.SELECT,
         replacements: {
           valid: COMMON.VALID.valid,
           ancestorId: nodeId,
@@ -225,10 +266,16 @@ class RelationService {
     }
   }
 
-  async getDirectParents(nodeId) {
+  async getDirectParents(options) {
+    const {
+      nodeId,
+      _name
+    } = options;
     try {
-      const list = await Relation.findAll({
-        attributes: [['ancestor', 'id']],
+      const list = await model[_name].findAll({
+        attributes: [
+          ['ancestor', 'id']
+        ],
         where: {
           descendant: nodeId,
           distance: 1,
@@ -244,10 +291,16 @@ class RelationService {
     }
   }
 
-  async getDirectChildren(nodeId) {
+  async getDirectChildren(options) {
+    const {
+      nodeId,
+      _name
+    } = options;
     try {
-      const list = await Relation.findAll({
-        attributes: [['descendant', 'id']],
+      const list = await model[_name].findAll({
+        attributes: [
+          ['descendant', 'id']
+        ],
         where: {
           ancestor: nodeId,
           distance: 1,
@@ -258,6 +311,26 @@ class RelationService {
         ]
       });
       return list.map(ele => ele.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllNode(options) {
+    const {
+      _name
+    } = options;
+    try {
+      const allList = await model[_name].findAll({
+        attributes: [
+          ['descendant', 'id']
+        ],
+        group: 'descendant',
+        where: {
+          valid: COMMON.VALID.valid,
+        }
+      });
+      return allList.map(ele => ele.id);
     } catch (error) {
       throw error;
     }
