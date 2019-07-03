@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-module.exports = (targetPath, ignore = []) => {
+module.exports = (targetPath, ignore = [], isCapital = false) => {
   const Module = {};
   try {
     const files = fs.readdirSync(targetPath);
@@ -9,7 +9,7 @@ module.exports = (targetPath, ignore = []) => {
         name = file.split('.')[0];
       const isExist = ignore.some(name => name.indexOf(file) === -1);
       isExist && (
-        Module[name] = require(`${targetPath}/${name}`)
+        Module[isCapital ? name.toUpperCase() : name] = require(`${targetPath}/${name}`)
       );
     }
   } catch (error) {

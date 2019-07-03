@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "node ./bin/www",
-    "model": "node node_modules/egg-sequelize-auto/bin/egg-sequelize-auto -o \"./app/model\" -d colsure_table -h 120.77.222.224 -u colsure -p 3306 -x colsure@2019 -e mysql"
+    "debug": "node --inspect ./bin/www"
   },
   "repository": {
     "type": "git",
@@ -23,8 +23,9 @@
   "homepage": "https://github.com/Fzlw/colsure_table#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
-    "sequelize": "^5.9.0"
+    "sequelize": "4.44.1"
   },
   "devDependencies": {
     "debug": "^4.1.1"

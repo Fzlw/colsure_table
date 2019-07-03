@@ -1,8 +1,20 @@
 module.exports = {
-  getParamsNotValid: () => {
+  getBaseResponse: () => {
     return {
       success: false,
-      message: '参数无效'
+      message: ''
     };
-  }
+  },
+  getSuccess: () => {
+    return {
+      success: true,
+      message: 'success'
+    };
+  },
+  getError: () => {
+    return {
+      success: false,
+      message: '服务异常'
+    };
+  },
 }

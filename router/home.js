@@ -10,7 +10,7 @@ module.exports = app => {
   // 获取节点所有父节点
   router.get('/relation/node/parents', controller.relation.getNodeParents);
   // 获取节点所有子节点
-  router.get('/relation/node/childre', controller.relation.getNodeChildren);
+  router.get('/relation/node/children', controller.relation.getNodeChildren);
   // 判断节点是否为叶子节点
   router.get('/relation/node/leaf', controller.relation.getNodeIsLeaf);
   // 获取节点的直接父节点
