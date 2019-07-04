@@ -11,11 +11,11 @@ module.exports = sequelize.define('relation', {
     autoIncrement: true
   },
   ancestor: {
-    type: Sequelize.STRING(32),
+    type: Sequelize.STRING(36),
     allowNull: false,
   },
   descendant: {
-    type: Sequelize.STRING(32),
+    type: Sequelize.STRING(36),
     allowNull: false,
   },
   distance: {
