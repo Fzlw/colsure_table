@@ -120,7 +120,7 @@ class Relation {
   }
 
   /**
-   * 获取节点所有父节点
+   * 获取节点所有父节点(最大层级)
    * GET
    */
   async getNodeParents(req, res) {
@@ -134,10 +134,19 @@ class Relation {
       res.send(result);
       return;
     }
+    const maxLen = Number(query.max_len);
+    if (query.max_len) {
+      if (!maxLen || Number.isNaN(maxLen)) {
+        result.message = '参数无效';
+        res.send(result);
+        return;
+      }
+    }
     try {
       const parents = await relation.getParentsOfNode({
         nodeId: query.node_id,
-        _name: query._name
+        _name: query._name,
+        maxLen
       });
       if (!Array.isArray(parents) || !parents.length) {
         result.message = '节点不存在';
@@ -157,7 +166,7 @@ class Relation {
   }
 
   /**
-   * 获取节点所有子节点
+   * 获取节点所有子节点(最大层级)
    * GET
    */
   async getNodeChildren(req, res) {
@@ -170,6 +179,14 @@ class Relation {
       result.message = '参数无效';
       res.send(result);
       return;
+    }
+    const maxLen = Number(query.max_len);
+    if (query.max_len) {
+      if (!maxLen || Number.isNaN(maxLen)) {
+        result.message = '参数无效';
+        res.send(result);
+        return;
+      }
     }
     try {
       const {
@@ -185,7 +202,8 @@ class Relation {
       }
       const children = await relation.getChildrenOfNode({
         nodeId: query.node_id,
-        _name: query._name
+        _name: query._name,
+        maxLen
       });
       result = {
         ...APIS.getSuccess(),
@@ -262,9 +280,10 @@ class Relation {
         res.send(result);
         return;
       }
-      const directParents = await relation.getDirectParents({
+      const directParents = await relation.getGivenDistanceParents({
         nodeId: query.node_id,
-        _name: query._name
+        _name: query._name,
+        distance: 1
       });
       result = {
         ...APIS.getSuccess(),
@@ -305,9 +324,10 @@ class Relation {
         res.send(result);
         return;
       }
-      const directChildren = await relation.getDirectChildren({
+      const directChildren = await relation.getGivenDistanceChildren({
         nodeId: query.node_id,
-        _name: query._name
+        _name: query._name,
+        distance: 1
       });
       result = {
         ...APIS.getSuccess(),
@@ -343,6 +363,54 @@ class Relation {
         ...APIS.getSuccess(),
         data: {
           nodes: list
+        }
+      };
+    } catch (error) {
+      result = APIS.getError();
+    }
+    res.send(result);
+  }
+
+  /**
+   * 获取当前节点指定层级的父/子节点id
+   * GET
+   */
+  async getDistanceList(req, res) {
+    const query = req.query;
+    let result = APIS.getBaseResponse();
+    // 参数验证
+    if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
+      !query.len || !Number(query.len) || typeof query.len !== 'string' ||
+      typeof query.up !== 'string' ||
+      !query.node_id || typeof query.node_id !== 'string') {
+      result.message = '参数无效';
+      res.send(result);
+      return;
+    }
+    try {
+      const {
+        exist
+      } = await relation.getNodeIsExistAndIsRoot({
+        nodeId: query.node_id,
+        _name: query._name
+      });
+      if (!exist) {
+        result.message = '节点不存在';
+        res.send(result);
+        return;
+      }
+      let serviceName = 'getGivenDistanceChildren';
+      !!query.up && (serviceName = 'getGivenDistanceParents');
+      const list = await relation[serviceName]({
+        nodeId: query.node_id,
+        _name: query._name,
+        distance: Number(query.len)
+      });
+      result = {
+        ...APIS.getSuccess(),
+        data: {
+          list
         }
       };
     } catch (error) {

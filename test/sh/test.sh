@@ -33,6 +33,9 @@ curl http://127.0.0.1:3000/relation/direct/children?_name=relation\&node_id=$pId
 echo "\r"
 # 获取所有节点id
 curl http://127.0.0.1:3000/relation/nodes/all?_name=relation
+echo "\r"
+# 获取所有节点id
+curl http://127.0.0.1:3000/relation/nodes/lenlist?_name=relation\&node_id=$nId_2\&len=1\&up=
 
 echo "\r"
 echo 'Test End.......'

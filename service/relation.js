@@ -64,16 +64,21 @@ class RelationService {
   async getParentsOfNode(options) {
     const {
       nodeId,
-      _name
+      _name,
+      maxLen
     } = options;
     let list = [];
     try {
+      const where = {
+        valid: COMMON.VALID.valid,
+        descendant: nodeId
+      };
+      maxLen && (where.distance = {
+        $lte: maxLen
+      });
       list = await model[_name].findAll({
         attributes: ['ancestor', 'distance'],
-        where: {
-          valid: COMMON.VALID.valid,
-          descendant: nodeId
-        }
+        where
       });
       return list;
     } catch (error) {
@@ -84,16 +89,21 @@ class RelationService {
   async getChildrenOfNode(options) {
     const {
       nodeId,
-      _name
+      _name,
+      maxLen
     } = options;
     let list = [];
     try {
+      const where = {
+        valid: COMMON.VALID.valid,
+        ancestor: nodeId
+      };
+      maxLen && (where.distance = {
+        $lte: maxLen
+      });
       list = await model[_name].findAll({
         attributes: ['ancestor', 'distance'],
-        where: {
-          valid: COMMON.VALID.valid,
-          ancestor: nodeId
-        }
+        where
       });
       return list;
     } catch (error) {
@@ -266,10 +276,11 @@ class RelationService {
     }
   }
 
-  async getDirectParents(options) {
+  async getGivenDistanceParents(options) {
     const {
       nodeId,
-      _name
+      _name,
+      distance
     } = options;
     try {
       const list = await model[_name].findAll({
@@ -278,7 +289,7 @@ class RelationService {
         ],
         where: {
           descendant: nodeId,
-          distance: 1,
+          distance,
           valid: COMMON.VALID.valid,
         },
         order: [
@@ -291,10 +302,11 @@ class RelationService {
     }
   }
 
-  async getDirectChildren(options) {
+  async getGivenDistanceChildren(options) {
     const {
       nodeId,
-      _name
+      _name,
+      distance
     } = options;
     try {
       const list = await model[_name].findAll({
@@ -303,7 +315,7 @@ class RelationService {
         ],
         where: {
           ancestor: nodeId,
-          distance: 1,
+          distance,
           valid: COMMON.VALID.valid,
         },
         order: [

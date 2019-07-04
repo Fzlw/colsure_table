@@ -10,8 +10,8 @@
   "scripts": {
     "dev": "node ./bin/www",
     "debug": "node --inspect ./bin/www",
-    "start_win": "set PORT=9555 && pm2 start ./bin/www",
-    "start_linux": "PORT=9555 && pm2 start ./bin/www",
+    "start_win": "set PORT=9555&& set NODE_ENV=prod&& pm2 start ./bin/www",
+    "start_linux": "PORT=9555&& NODE_ENV=prod&& pm2 start ./bin/www",
     "stop": "pm2 stop 0",
     "restart": "pm2 restart 0"
   },
