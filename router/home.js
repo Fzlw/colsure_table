@@ -21,4 +21,6 @@ module.exports = app => {
   router.get('/relation/nodes/all', controller.relation.getAllNodes);
   // 获取当前节点指定层级的父/子节点id
   router.get('/relation/nodes/lenlist', controller.relation.getDistanceList);
+  // 获取指定节点的所有子节点(最大深度)
+  router.get('/relation/nodes/tree', controller.relation.getNodesByAncestors);
 };

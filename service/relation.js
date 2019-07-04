@@ -80,7 +80,12 @@ class RelationService {
         attributes: ['ancestor', 'distance'],
         where
       });
-      return list;
+      const data = [];
+      list.forEach(re => {
+        re.ancestor !== nodeId &&
+          data.push(re.ancestor);
+      });
+      return data;
     } catch (error) {
       throw error;
     }
@@ -102,10 +107,15 @@ class RelationService {
         $lte: maxLen
       });
       list = await model[_name].findAll({
-        attributes: ['ancestor', 'distance'],
+        attributes: ['descendant', 'distance'],
         where
       });
-      return list;
+      const data = [];
+      list.forEach(re => {
+        re.descendant !== nodeId &&
+          data.push(re.descendant);
+      });
+      return data;
     } catch (error) {
       throw error;
     }
@@ -343,6 +353,41 @@ class RelationService {
         }
       });
       return allList.map(ele => ele.id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getChildrenToTree(options) {
+    const {
+      nodeIds,
+      _name,
+      maxLen
+    } = options;
+    try {
+      const where = {
+        valid: COMMON.VALID.valid,
+        ancestor: nodeIds
+      };
+      maxLen && (where.distance = {
+        $lte: maxLen
+      });
+      const list = await model[_name].findAll({
+        attributes: ['ancestor', 'descendant', 'distance'],
+        where
+      });
+      // 数据整理
+      const data = {};
+      list.forEach(record => {
+        const {
+          ancestor,
+          descendant
+        } = record;
+        data[ancestor] = data[ancestor] || [];
+        !nodeIds.includes(descendant) &&
+          data[ancestor].push(descendant);
+      })
+      return data;
     } catch (error) {
       throw error;
     }

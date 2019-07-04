@@ -419,6 +419,45 @@ class Relation {
     res.send(result);
   }
 
+  /**
+   * 获取指定节点的所有子节点(最大深度)
+   * GET
+   */
+  async getNodesByAncestors(req, res) {
+    const query = req.query;
+    let result = APIS.getBaseResponse();
+    // 参数验证
+    if (!query._name || typeof query._name !== 'string' ||
+      !(query._name in COMMON._NAMES) ||
+      !query.nodes || typeof query.nodes !== 'string') {
+      result.message = '参数无效';
+      res.send(result);
+      return;
+    }
+    const maxLen = Number(query.max_len);
+    if (query.max_len) {
+      if (!maxLen || Number.isNaN(maxLen)) {
+        result.message = '参数无效';
+        res.send(result);
+        return;
+      }
+    }
+    try {
+      const data = await relation.getChildrenToTree({
+        nodeId: query.nodes.split(','),
+        _name: query._name,
+        maxLen
+      });
+      result = {
+        ...APIS.getSuccess(),
+        data
+      };
+    } catch (error) {
+      result = APIS.getError();
+    }
+    res.send(result);
+  }
+
 }
 
 module.exports = new Relation();
