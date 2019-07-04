@@ -9,10 +9,7 @@
   },
   "scripts": {
     "dev": "node ./bin/www",
-    "debug": "node --inspect ./bin/www",
-    "start": "pm2 start ./bin/www --env prod --port 9555",
-    "stop": "pm2 stop 0",
-    "restart": "pm2 restart 0"
+    "debug": "node --inspect ./bin/www"
   },
   "repository": {
     "type": "git",
