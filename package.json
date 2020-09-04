@@ -27,7 +27,7 @@
     "morgan": "^1.9.1",
     "mysql2": "^1.6.5",
     "pm2": "^3.5.1",
-    "sequelize": "4.44.1"
+    "sequelize": "6.3.5"
   },
   "devDependencies": {
     "debug": "^4.1.1"
